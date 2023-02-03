@@ -1,5 +1,7 @@
 package org.mps.garoda.factorial;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -14,21 +16,31 @@ import static org.junit.jupiter.api.Assertions.*;
  * </ol>
  */
 class FactorialTest {
+
+    private Factorial factorial;
+
+    @BeforeEach
+    void setup(){
+        factorial = new Factorial();
+    }
+
+    @AfterEach
+    void shutdown(){
+        factorial = null;
+    }
+
     @Test
     void factorialOfZeroIsOne(){
-        var factorial = new Factorial();
         assertEquals(1,factorial.compute(0));
     }
 
     @Test
     void factorialOfOneIsOne(){
-        var factorial = new Factorial();
         assertEquals(1,factorial.compute(1));
     }
 
     @Test
     void factorialOfTwoIsTwo(){
-        var factorial = new Factorial();
         assertEquals(2,factorial.compute(2));
     }
 }
