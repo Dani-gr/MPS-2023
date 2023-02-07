@@ -4,7 +4,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * <h2>Test cases</h2>
@@ -20,27 +21,34 @@ class FactorialTest {
     private Factorial factorial;
 
     @BeforeEach
-    void setup(){
+    void setup() {
         factorial = new Factorial();
     }
 
     @AfterEach
-    void shutdown(){
+    void shutdown() {
         factorial = null;
     }
 
     @Test
-    void factorialOfZeroIsOne(){
-        assertEquals(1,factorial.compute(0));
+    void factorialOfZeroIsOne() {
+        assertEquals(1, factorial.compute(0));
     }
 
     @Test
-    void factorialOfOneIsOne(){
-        assertEquals(1,factorial.compute(1));
+    void factorialOfOneIsOne() {
+        assertEquals(1, factorial.compute(1));
     }
 
     @Test
-    void factorialOfTwoIsTwo(){
-        assertEquals(2,factorial.compute(2));
+    void factorialOfTwoIsTwo() {
+        assertEquals(2, factorial.compute(2));
     }
+
+    @Test
+    void factorialOfNegativeIsError() {
+        assertThrows(NegativeValueException.class, () -> factorial.compute(-2));
+    }
+
+
 }
