@@ -22,7 +22,9 @@ public class Person {
      */
     public Person(String name, int age, String gender) {
         if (name.isBlank()) throw new InvalidStringException("A person's name can't be empty.");
-        if (age < 0) throw new NegativeValueException("A person's age can't be negative.");
+        if (age < 0) throw new InvalidAgeException("A person's age can't be negative.");
+        if (age >= 170) throw new InvalidAgeException("A person doesn't live that long!");
+
         if (gender.isBlank() || !(gender.equalsIgnoreCase("male") || gender.equalsIgnoreCase("female")))
             throw new InvalidStringException("A person's gender must be 'male' or 'female'");
 

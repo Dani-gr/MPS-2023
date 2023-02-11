@@ -5,8 +5,8 @@ package org.mps.garoda.person;
  *
  * @author Daniel García Rodríguez
  */
-public class NegativeValueException extends IllegalArgumentException{
-    public NegativeValueException(String errorMessage){
+public class InvalidAgeException extends IllegalArgumentException{
+    public InvalidAgeException(String errorMessage){
         super(errorMessage);
     }
 }
