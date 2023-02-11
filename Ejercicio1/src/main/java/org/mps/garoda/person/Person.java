@@ -9,6 +9,7 @@ import java.util.Locale;
  * @author Daniel García Rodríguez
  */
 public class Person {
+    public static final int MAX_AGE = 170;
     private final String name;
     private final int age;
     private final String gender; //male, female
@@ -23,7 +24,7 @@ public class Person {
     public Person(String name, int age, String gender) {
         if (name.isBlank()) throw new InvalidStringException("A person's name can't be empty.");
         if (age < 0) throw new InvalidAgeException("A person's age can't be negative.");
-        if (age >= 170) throw new InvalidAgeException("A person doesn't live that long!");
+        if (age >= MAX_AGE) throw new InvalidAgeException("A person doesn't live that long!");
 
         if (gender.isBlank() || !(gender.equalsIgnoreCase("male") || gender.equalsIgnoreCase("female")))
             throw new InvalidStringException("A person's gender must be 'male' or 'female'");
@@ -55,7 +56,20 @@ public class Person {
      * the female mean age.
      */
     public double[] averageAgePerGender(List<Person> persons) {
-        //TODO
-        return null;
+        double[] averages = new double[2];
+        int numberOfMen = 0, numberOfWomen = 0;
+        for (Person p : persons) {
+            if (p.gender().equalsIgnoreCase("male")) {
+                numberOfMen++;
+                averages[0] += p.age();
+            } else if (p.gender().equalsIgnoreCase("female")) {
+                numberOfWomen++;
+                averages[1] += p.age();
+            }
+        }
+
+        if(numberOfMen > 1) averages[0] /= numberOfMen;
+        if(numberOfWomen > 1) averages[1] /= numberOfWomen;
+        return averages;
     }
 }
