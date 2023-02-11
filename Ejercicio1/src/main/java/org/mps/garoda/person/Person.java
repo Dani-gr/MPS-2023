@@ -25,14 +25,16 @@ public class Person {
      * @param gender the gender of the person
      */
     public Person(String name, int age, String gender) {
-        if (name.isBlank()) throw new InvalidStringException("A person's name can't be empty.");
+        this.name = name.trim().toLowerCase(Locale.ROOT);
+
+        if (name().isBlank()) throw new InvalidStringException("A person's name can't be empty.");
         if (age < 0) throw new InvalidAgeException("A person's age can't be negative.");
         if (age >= MAX_AGE) throw new InvalidAgeException("A person doesn't live that long!");
         gender = gender.trim();
         if (!(gender.equalsIgnoreCase("male") || gender.equalsIgnoreCase("female")))
             throw new InvalidStringException("A person's gender must be 'male' or 'female'");
 
-        this.name = name.trim().toLowerCase(Locale.ROOT);
+
         this.age = age;
         this.gender = gender.toLowerCase(Locale.ROOT);
     }
