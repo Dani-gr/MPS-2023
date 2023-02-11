@@ -9,6 +9,9 @@ import java.util.Locale;
  * @author Daniel García Rodríguez
  */
 public class Person {
+    /**
+     * Reasonable superior limit of age.
+     */
     public static final int MAX_AGE = 170;
     private final String name;
     private final int age;
@@ -25,11 +28,11 @@ public class Person {
         if (name.isBlank()) throw new InvalidStringException("A person's name can't be empty.");
         if (age < 0) throw new InvalidAgeException("A person's age can't be negative.");
         if (age >= MAX_AGE) throw new InvalidAgeException("A person doesn't live that long!");
-
-        if (gender.isBlank() || !(gender.equalsIgnoreCase("male") || gender.equalsIgnoreCase("female")))
+        gender = gender.trim();
+        if (!(gender.equalsIgnoreCase("male") || gender.equalsIgnoreCase("female")))
             throw new InvalidStringException("A person's gender must be 'male' or 'female'");
 
-        this.name = name.toLowerCase(Locale.ROOT);
+        this.name = name.trim().toLowerCase(Locale.ROOT);
         this.age = age;
         this.gender = gender.toLowerCase(Locale.ROOT);
     }
@@ -68,8 +71,8 @@ public class Person {
             }
         }
 
-        if(numberOfMen > 1) averages[0] /= numberOfMen;
-        if(numberOfWomen > 1) averages[1] /= numberOfWomen;
+        if (numberOfMen > 1) averages[0] /= numberOfMen;
+        if (numberOfWomen > 1) averages[1] /= numberOfWomen;
         return averages;
     }
 }

@@ -25,6 +25,33 @@ class PersonTest {
     }
 
     /**
+     * Tests if creating a {@link Person} with a blank name results in
+     * an {@link InvalidStringException} exception.
+     */
+    @Test
+    void aPersonCantHaveABlankName() {
+        assertThrows(InvalidStringException.class, () -> new Person("", 10, "male"));
+        assertThrows(InvalidStringException.class, () -> new Person(" ", 10, "female"));
+        assertThrows(InvalidStringException.class, () -> new Person("  ", 10, "female"));
+        assertThrows(InvalidStringException.class, () -> new Person("   ", 10, "male"));
+    }
+
+    /**
+     * Tests if creating a {@link Person} with a gender not equal to <i>"male"</i> or <i>"female"</i>
+     * results in an {@link InvalidStringException} exception.
+     */
+    @Test
+    void aPersonCantHaveAnInvalidGender() {
+        assertThrows(InvalidStringException.class, () -> new Person("Steve", 20, "mate"));
+        assertThrows(InvalidStringException.class, () -> new Person("Narinder", 20, "Lamb"));
+        assertThrows(InvalidStringException.class, () -> new Person("test", 20, "  "));
+        assertThrows(InvalidStringException.class, () -> new Person("abcdef", 20, "abcd"));
+        assertDoesNotThrow(() -> new Person("abcdef", 20, "male"));
+        assertDoesNotThrow(() -> new Person("test", 20, "female"));
+
+    }
+
+    /**
      * Tests if creating a {@link Person} with negative age results in
      * an {@link InvalidAgeException} exception.
      */
