@@ -3,9 +3,11 @@ package org.mps.garoda.factorial;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import java.time.Duration;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * <h2>Test cases</h2>
@@ -13,9 +15,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  *     <li>factorial 0 -> 1</li>
  *     <li>factorial 1 -> 1</li>
  *     <li>factorial 2 -> 2</li>
- *     <li>factorial n -> n * factorial (n-1)</li>
+ *     <li>factorial 5 -> 120</li>
+ *     <li>factorial -2 -> {@link NegativeValueException}</li>
+ *     <li>factorial 70 -> Timeout</li>
  * </ol>
  */
+@TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class FactorialTest {
 
     private Factorial factorial;
@@ -46,8 +51,18 @@ class FactorialTest {
     }
 
     @Test
+    void factorialOfFiveIs120() {
+        assertEquals(120, factorial.compute(5));
+    }
+
+    @Test
     void factorialOfNegativeIsError() {
         assertThrows(NegativeValueException.class, () -> factorial.compute(-2));
+    }
+	
+	@Test
+    void factorialGrandeTardaMasDe2Milesimas() {
+        assertTimeout(Duration.ofMillis(2), () -> factorial.computeBigValue(70));
     }
 
 
