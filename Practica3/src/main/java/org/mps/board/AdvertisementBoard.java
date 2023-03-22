@@ -46,11 +46,15 @@ public class AdvertisementBoard {
     public void publish(Advertisement advertisement,
                         AdvertiserDatabase advertiserDatabase,
                         PaymentGateway paymentGateway) {
+        if(numberOfPublishedAdvertisements() >= MAX_BOARD_SIZE)
+            throw new AdvertisementBoardException("The board is full");
+
         if (advertisement.advertiser.equals(BOARD_OWNER))
             advertisementList.add(advertisement);
-        else {
-            if (advertiserDatabase.advertiserIsRegistered(advertisement.advertiser) &&
-                    paymentGateway.advertiserHasFunds(advertisement.advertiser)) {
+        else if (advertiserDatabase.advertiserIsRegistered(advertisement.advertiser) &&
+                paymentGateway.advertiserHasFunds(advertisement.advertiser)) {
+            var aux = findByTitle(advertisement.title);
+            if(aux.isEmpty() || !aux.get().advertiser.equals(advertisement.advertiser)) {
                 advertisementList.add(advertisement);
                 paymentGateway.chargeAdvertiser(advertisement.advertiser);
             }
