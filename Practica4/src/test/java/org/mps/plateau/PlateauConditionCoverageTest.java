@@ -35,9 +35,9 @@ class PlateauConditionCoverageTest {
     }
 
     @Test
-    @DisplayName("Given a non-null array [1 0 4 4 4 0 7 8 0 2 3 4] with an \"unclosed\" plateau at the end, " +
-            "when calling longestPlateau() then the first plateau (position 2 and length 3) is returned as a Pair.")
-    void nonNullArrayWithAscendingOrderAtTheEnd() {
+    @DisplayName("Given a non-null array [5 4 3 2 1] with no plateau, and descending order, " +
+            "when calling longestPlateau() then the default values (position -1 and length 0) are returned as a Pair.")
+    void nonNullArrayWithDescendingOrderAndNoPlateau() {
         array = new int[]{5, 4, 3, 2, 1};
 
         Plateau.Pair expected = new Plateau.Pair(-1, 0);
