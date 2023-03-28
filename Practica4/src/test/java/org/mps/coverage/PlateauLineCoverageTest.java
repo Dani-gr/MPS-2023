@@ -1,4 +1,4 @@
-package org.mps.plateau;
+package org.mps.coverage;
 
 import static org.junit.jupiter.api.Assertions.*;
 
