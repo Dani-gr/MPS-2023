@@ -24,7 +24,6 @@ class ArrayBoundedQueueTest {
     @Nested
     @DisplayName("Tests for invalid arguments:")
     class InvalidArguments {
-        @SuppressWarnings("JUnitTestMethodWithNoAssertions") //TODO: Remove
         @Test
         @DisplayName("Given a non-positive size when creating a queue, an IllegalArgumentException will be thrown.")
         void nonPositiveSizeThrowsException() {
@@ -199,7 +198,7 @@ class ArrayBoundedQueueTest {
         }
 
         @Test
-        @DisplayName("2. [- 3 -] (3) | One element")
+        @DisplayName("2. [- {3} -] (3) | One element")
         void oneElement() {
             // Setup
             queue.put(1);
@@ -210,7 +209,7 @@ class ArrayBoundedQueueTest {
         }
 
         @Test
-        @DisplayName("3. [5 3 -] (5 -> 3) | Two elements together")
+        @DisplayName("3. [{5} 3 -] (5 -> 3) | Two elements together")
         void twoElementsTogether() {
             // Setup
             queue.put(5);
@@ -220,7 +219,7 @@ class ArrayBoundedQueueTest {
         }
 
         @Test
-        @DisplayName("4. [4 - 9] (9 -> 4) | Two elements looping")
+        @DisplayName("4. [4 - {9}] (9 -> 4) | Two elements looping")
         void twoElementsLooping() {
             // Setup
             queue.put(1);
@@ -234,7 +233,7 @@ class ArrayBoundedQueueTest {
         }
 
         @Test
-        @DisplayName("5. [4 7 9] (4 -> 7 -> 9) | Full")
+        @DisplayName("5. [{4} 7 9] (4 -> 7 -> 9) | Full")
         void full() {
             // Setup
             queue.put(4);
@@ -282,12 +281,34 @@ class ArrayBoundedQueueTest {
     }
 
     @Nested
-    @DisplayName("Tests for loops:")
+    @DisplayName("Tests for changes in indexes with or without loops:")
     class Loops {
         @Test
-        @DisplayName("Given a non-empty nor-full queue with an element at the end and beginning of the buffer, " +
-                "when getting a value, the *first* attribute becomes 0.")
-        void firstAttributeLoopsAround() {
+        @DisplayName("Given the queue [{4} 7 -] (4 -> 7), " +
+                "when getting a value, the *first* attribute becomes 1.")
+        void firstAttributeWithoutLoop() {
+            // Setup
+            queue.put(4);
+            queue.put(7);
+
+            // Given
+            assertThat(ReflectionTestUtils.getField(queue, "first"))
+                    .as("The *first* position should be on index 0")
+                    .isEqualTo(0);
+
+            // When
+            queue.get();
+
+            // Then
+            assertThat(ReflectionTestUtils.getField(queue, "first"))
+                    .as("The *first* position should be on index 1")
+                    .isEqualTo(1);
+
+        }
+        @Test
+        @DisplayName("Given the queue [1 - {9}] (9 -> 1), " +
+                "when getting a value, the *first* attribute loops to 0.")
+        void firstAttributeWithLoop() {
             // Setup
             queue.put(4);
             queue.put(7);
@@ -309,6 +330,94 @@ class ArrayBoundedQueueTest {
                     .as("The *first* position should be on index 0")
                     .isEqualTo(0);
 
+        }
+        @Test
+        @DisplayName("Given the queue [{4} - -] (4), " +
+                "when putting a valid value, the *nextFree* attribute becomes 2.")
+        void nextFreeAttributeWithoutLoop() {
+            // Setup
+            queue.put(4);
+
+            // Given
+            assertThat(ReflectionTestUtils.getField(queue, "nextFree"))
+                    .as("The *nextFree* position should be on index 1")
+                    .isEqualTo(1);
+
+            // When
+            queue.put(7);
+
+            // Then
+            assertThat(ReflectionTestUtils.getField(queue, "nextFree"))
+                    .as("The *nextFree* position should be on index 2")
+                    .isEqualTo(2);
+        }
+        @Test
+        @DisplayName("Given the queue [{4} 7 -] (4 -> 7), " +
+                "when putting a valid value, the *nextFree* attribute loops to 0.")
+        void nextFreeAttributeWithLoop() {
+            // Setup
+            queue.put(4);
+            queue.put(7);
+
+            // Given
+            assertThat(ReflectionTestUtils.getField(queue, "nextFree"))
+                    .as("The *nextFree* position should be on index 2")
+                    .isEqualTo(2);
+
+            // When
+            queue.put(9);
+
+            // Then
+            assertThat(ReflectionTestUtils.getField(queue, "nextFree"))
+                    .as("The *nextFree* position should be on index 0")
+                    .isEqualTo(0);
+        }
+        @Test
+        @DisplayName("Given the queue [{4} 7 -] (4 -> 7), " +
+                "when starting to iterate the queue, the index of the iterator becomes 1.")
+        void iteratorIteratesWithoutLoop() {
+            // Setup
+            queue.put(4);
+            queue.put(7);
+            var iterator = queue.iterator();
+
+            // Given
+            assertThat(ReflectionTestUtils.getField(iterator, "current"))
+                    .as("The index of the iterator should be 0")
+                    .isEqualTo(0);
+
+            // When
+            iterator.next();
+
+            // Then
+            assertThat(ReflectionTestUtils.getField(iterator, "current"))
+                    .as("The index of the iterator should be 1")
+                    .isEqualTo(1);
+        }
+        @Test
+        @DisplayName("Given the queue [4 7 {9}] (9 -> 4 -> 7), " +
+                "when starting to iterate the queue, the index of the iterator loops to 0.")
+        void iteratorIteratesWithLoop() {
+            // Setup
+            ReflectionTestUtils.setField(queue, "first", 2);
+            ReflectionTestUtils.setField(queue, "nextFree", 2);
+            queue.put(9);
+            queue.put(4);
+            queue.put(7);
+            var iterator = queue.iterator();
+
+            // Given
+            assertThat(ReflectionTestUtils.getField(iterator, "current"))
+                    .as("The index of the iterator should be 2")
+                    .isEqualTo(2);
+
+            // When
+            iterator.next();
+
+            // Then
+            assertThat(ReflectionTestUtils.getField(iterator, "current"))
+                    .as("The index of the iterator should be 0")
+                    .isEqualTo(0);
         }
     }
 
