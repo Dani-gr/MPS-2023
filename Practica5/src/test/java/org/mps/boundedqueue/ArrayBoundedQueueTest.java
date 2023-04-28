@@ -12,7 +12,103 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 /**
- * TODO create comment
+ * <h1>Tests</h1>
+ * <ul>
+ *     <li>
+ *         <b>Tests for invalid arguments or operations:</b>
+ *         <ul>
+ *             <li>
+ *                 Given a non-positive size when creating a queue,
+ *                 an {@link IllegalArgumentException} will be thrown.
+ *             </li>
+ *             <li>
+ *                 Given a not-full queue, when putting a null element,
+ *                 an {@link IllegalArgumentException} will be thrown.
+ *             </li>
+ *             <li>
+ *                 Given the queue [{4} 7 -] (4 -> 7), when iterating the queue out of the queue's bounds,
+ *                 an {@link NoSuchElementException} is thrown.
+ *             </li>
+ *         </ul>
+ *     </li>
+ *     <li>Given a non-empty queue, when the queue is iterated, only not-null elements are iterated through.</li>
+ *     <li>
+ *         <b>Given an empty queue:</b>
+ *         <ul>
+ *             <li>when the queue is iterated, there's no elements to iterate through.</li>
+ *             <li>when calling the method {@code get()}, an {@link EmptyBoundedQueueException} is thrown.</li>
+ *         </ul>
+ *     </li>
+ *     <li>
+ *         <b>Given an non-empty, non-full queue:</b>
+ *         <ul>
+ *             <li>
+ *                 when the queue is iterated, the number of elements to iterate through is less than
+ *                 the buffer's size (but equal to the queue's size).
+ *             </li>
+ *         </ul>
+ *     </li>
+ *     <li>
+ *         <b>Given a full queue:</b>
+ *         <ul>
+ *             <li>
+ *                 when the queue is iterated, the number of elements to iterate through equals
+ *                 the buffer's size (and the queue size).
+ *             </li>
+ *             <li>when calling the method put, a {@link FullBoundedQueueException} is thrown.</li>
+ *         </ul>
+ *     </li>
+ *     <li>
+ *         Given a queue, when the buffer is checked, all the elements are {@code null} except for
+ *         the values in the queue:
+ *         <ol>
+ *             <li>[- - -] () | Empty</li>
+ *             <li>[- {3} -] (3) | One element</li>
+ *             <li>[{5} 3 -] (5 -> 3) | Two elements together</li>
+ *             <li>[4 - {9}] (9 -> 4) | Two elements looping</li>
+ *             <li>[{4} 7 9] (4 -> 7 -> 9) | Full</li>
+ *         </ol>
+ *     </li>
+ *     <li>
+ *         <b>Explicit tests for changes in indexes with or without loops:</b>
+ *         <ul>
+ *             <li>
+ *                 Without loops:
+ *                 <ul>
+ *                     <li>
+ *                         Given the queue [{4} 7 -] (4 -> 7), when getting a value,
+ *                         the <i>first</i> attribute becomes {@code 1}.
+ *                     </li>
+ *                     <li>
+ *                         Given the queue [{4} - -] (4), when putting a valid value,
+ *                         the <i>nextFree</i> attribute becomes {@code 2}.
+ *                     </li>
+ *                     <li>
+ *                         Given the queue [{4} 7 -] (4 -> 7), when starting to iterate the queue,
+ *                         the index of the iterator becomes {@code 1}.
+ *                     </li>
+ *                 </ul>
+ *             </li>
+ *             <li>
+ *                 With loops:
+ *                 <ul>
+ *                     <li>
+ *                         Given the queue [1 - {9}] (9 -> 1), when getting a value,
+ *                         the <i>first</i> attribute loops to {@code 0}.
+ *                     </li>
+ *                     <li>
+ *                         Given the queue [{4} 7 -] (4 -> 7), when putting a valid value,
+ *                         the <i>nextFree</i> attribute loops to {@code 0}.
+ *                     </li>
+ *                     <li>
+ *                         Given the queue [4 7 {9}] (9 -> 4 -> 7), when starting to iterate the queue,
+ *                         the index of the iterator loops to {@code 0}.
+ *                     </li>
+ *                 </ul>
+ *             </li>
+ *         </ul>
+ *     </li>
+ * </ul>
  */
 class ArrayBoundedQueueTest {
 
@@ -311,7 +407,7 @@ class ArrayBoundedQueueTest {
     }
 
     @Nested
-    @DisplayName("Tests for changes in indexes with or without loops:")
+    @DisplayName("Explicit tests for changes in indexes with or without loops:")
     class Loops {
         @Test
         @DisplayName("Given the queue [{4} 7 -] (4 -> 7), " +
