@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.NoSuchElementException;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
@@ -22,7 +24,7 @@ class ArrayBoundedQueueTest {
     }
 
     @Nested
-    @DisplayName("Tests for invalid arguments:")
+    @DisplayName("Tests for invalid arguments or operations:")
     class InvalidArguments {
         @Test
         @DisplayName("Given a non-positive size when creating a queue, an IllegalArgumentException will be thrown.")
@@ -39,6 +41,28 @@ class ArrayBoundedQueueTest {
             assertThatExceptionOfType(IllegalArgumentException.class)
                     .isThrownBy(() -> queue.put(null))
                     .withMessage("put: element cannot be null");
+        }
+
+        @Test
+        @DisplayName("Given the queue [{4} 7 -] (4 -> 7), " +
+                "when iterating the queue out of the queue's bounds, an NoSuchElementException is thrown.")
+        void iteratorIteratesOutOfBounds() {
+            // Setup
+            queue.put(4);
+            queue.put(7);
+            var iterator = queue.iterator();
+            iterator.next();
+            iterator.next();
+
+            // Given
+            assertThat(ReflectionTestUtils.getField(iterator, "current"))
+                    .as("The index of the iterator should be 2")
+                    .isEqualTo(2);
+
+            // When - Then
+            assertThatExceptionOfType(NoSuchElementException.class)
+                    .isThrownBy(iterator::next)
+                    .withMessage("next: bounded queue iterator exhausted");
         }
     }
 
@@ -106,7 +130,8 @@ class ArrayBoundedQueueTest {
         }
 
         @Test
-        @DisplayName("when the queue is iterated, the number of elements to iterate through is less than the buffer's size.")
+        @DisplayName("when the queue is iterated, " +
+                "the number of elements to iterate through is less than the buffer's size (but equal to the queue's size).")
         void hasOnlyQueueElementsInTheIterator() {
             assertThat(queue.isEmpty())
                     .as("The queue should not be empty")
@@ -129,7 +154,9 @@ class ArrayBoundedQueueTest {
             }
             assertThat(numElements)
                     .as("The iterator should iterate through less elements than the buffer's size.")
-                    .isLessThan(buffer.length);
+                    .isLessThan(buffer.length)
+                    .as("The iterator should iterate through the same number of elements as the queue's current size.")
+                    .isEqualTo(queue.size());
         }
     }
 
@@ -144,7 +171,8 @@ class ArrayBoundedQueueTest {
         }
 
         @Test
-        @DisplayName("when the queue is iterated, the number of elements to iterate through equals the buffer's size.")
+        @DisplayName("when the queue is iterated, " +
+                "the number of elements to iterate through equals the buffer's size (and the queue size).")
         void hasAllElementsInTheIterator() {
             assertThat(queue.isFull())
                     .as("The queue should be full")
@@ -164,7 +192,9 @@ class ArrayBoundedQueueTest {
             }
             assertThat(numElements)
                     .as("The iterator should iterate through the same number of elements as the buffer's size.")
-                    .isEqualTo(buffer.length);
+                    .isEqualTo(buffer.length)
+                    .as("The iterator should iterate through the same number of elements as the queue's current size.")
+                    .isEqualTo(queue.size());
         }
 
         @Test
@@ -305,6 +335,7 @@ class ArrayBoundedQueueTest {
                     .isEqualTo(1);
 
         }
+
         @Test
         @DisplayName("Given the queue [1 - {9}] (9 -> 1), " +
                 "when getting a value, the *first* attribute loops to 0.")
@@ -331,6 +362,7 @@ class ArrayBoundedQueueTest {
                     .isEqualTo(0);
 
         }
+
         @Test
         @DisplayName("Given the queue [{4} - -] (4), " +
                 "when putting a valid value, the *nextFree* attribute becomes 2.")
@@ -351,6 +383,7 @@ class ArrayBoundedQueueTest {
                     .as("The *nextFree* position should be on index 2")
                     .isEqualTo(2);
         }
+
         @Test
         @DisplayName("Given the queue [{4} 7 -] (4 -> 7), " +
                 "when putting a valid value, the *nextFree* attribute loops to 0.")
@@ -372,6 +405,7 @@ class ArrayBoundedQueueTest {
                     .as("The *nextFree* position should be on index 0")
                     .isEqualTo(0);
         }
+
         @Test
         @DisplayName("Given the queue [{4} 7 -] (4 -> 7), " +
                 "when starting to iterate the queue, the index of the iterator becomes 1.")
@@ -394,6 +428,7 @@ class ArrayBoundedQueueTest {
                     .as("The index of the iterator should be 1")
                     .isEqualTo(1);
         }
+
         @Test
         @DisplayName("Given the queue [4 7 {9}] (9 -> 4 -> 7), " +
                 "when starting to iterate the queue, the index of the iterator loops to 0.")
@@ -420,5 +455,4 @@ class ArrayBoundedQueueTest {
                     .isEqualTo(0);
         }
     }
-
 }
