@@ -21,7 +21,61 @@ class UserRegistrationTest {
             userRegistration = new UserRegistration(validator, store);
         }
 
+        @Test
+        @Tag("Fase1")
+        @DisplayName("with valid email and password, then the credentials are stored.")
+        void validDataRegistersInSet() {
+            Email email = Mockito.mock(Email.class); //Dummy
+            PasswordString password = Mockito.mock(PasswordString.class); //Dummy
+            Mockito.when(validator.validate(email,password)).thenReturn(CredentialValidator.ValidationStatus.VALIDATION_OK);
 
+            userRegistration.register(email, password);
+
+            Mockito.verify(store, Mockito.times(1)).store(email, password);
+        }
+
+        @Test
+        @Tag("Fase1")
+        @DisplayName("with invalid email, then the credentials are not stored.")
+        void invalidEmailIsNotRegistered() {
+            Email email = Mockito.mock(Email.class); //Dummy
+            PasswordString password = Mockito.mock(PasswordString.class); //Dummy
+            Mockito.when(validator.validate(email,password)).thenReturn(CredentialValidator.ValidationStatus.EMAIL_INVALID);
+
+            userRegistration.register(email, password);
+
+            Mockito.verify(store, Mockito.never()).store(email, password);
+        }
+
+        @Test
+        @Tag("Fase1")
+        @DisplayName("with invalid password, then the credentials are not stored.")
+        void invalidPasswordIsNotRegistered() {
+            Email email = Mockito.mock(Email.class); //Dummy
+            PasswordString password = Mockito.mock(PasswordString.class); //Dummy
+            Mockito.when(validator.validate(email,password)).thenReturn(CredentialValidator.ValidationStatus.PASSWORD_INVALID);
+
+            userRegistration.register(email, password);
+
+            Mockito.verify(store, Mockito.never()).store(email, password);
+        }
+
+        @Test
+        @Tag("Fase1")
+        @DisplayName("with valid email and password, but already registered, then the credentials are not stored again.")
+        void alreadyRegisteredDataFails() {
+            Email email = Mockito.mock(Email.class); //Dummy
+            PasswordString password = Mockito.mock(PasswordString.class); //Dummy
+            Mockito.when(validator.validate(email,password)).thenReturn(CredentialValidator.ValidationStatus.VALIDATION_OK);
+            userRegistration.register(email, password);
+            Mockito.when(store.credentialExists(email, password)).thenReturn(true);
+            Mockito.when(validator.validate(email,password)).thenReturn(CredentialValidator.ValidationStatus.EXISTING_CREDENTIAL);
+
+            userRegistration.register(email, password);
+
+            assertTrue(store.credentialExists(email, password));
+            Mockito.verify(store, Mockito.times(1)).store(email, password);
+        }
     }
 
     @Nested
